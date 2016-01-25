@@ -113,6 +113,9 @@ def baseconfig(
 
 	if cmssw_version >= (7, 4, 0):
 		process.kappaTuple.Info.overrideHLTCheck = cms.untracked.bool(True)
+	# must be set explicitly for consume emchanic
+	if cmssw_version >= (7, 6, 0):
+		process.kappaTuple.Info.hltSource = cms.InputTag("TriggerResults", "", "HLT")
 
 	if channel == 'mm':
 		process.kappaTuple.Info.hltWhitelist = cms.vstring(
@@ -362,6 +365,30 @@ def baseconfig(
 	process.path *= (
 		process.kappaOut
 	)
+	# explicit declaration until white/blacklist works again - MF@160119
+	# note: extracted from running on CMSSW < 7_6
+	if cmssw_version >= (7, 6, 0):
+		process.kappaTuple.BeamSpot.offlineBeamSpot = cms.PSet(src=cms.InputTag("offlineBeamSpot"))
+		process.kappaTuple.VertexSummary.offlinePrimaryVerticesSummary = cms.PSet(src=cms.InputTag("offlinePrimaryVertices"))
+		process.kappaTuple.VertexSummary.goodOfflinePrimaryVerticesSummary = cms.PSet(src=cms.InputTag("goodOfflinePrimaryVertices"))
+
+		if not data:
+			process.kappaTuple.LV.ak4GenJetsNoNu = cms.PSet(src=cms.InputTag("ak4GenJetsNoNu"))
+			process.kappaTuple.LV.ak5GenJetsNoNu = cms.PSet(src=cms.InputTag("ak5GenJetsNoNu"))
+			process.kappaTuple.LV.ak8GenJetsNoNu = cms.PSet(src=cms.InputTag("ak8GenJetsNoNu"))
+
+		process.kappaTuple.PileupDensity.pileupDensity = cms.PSet(src=cms.InputTag("fixedGridRhoFastjetAll"))
+		process.kappaTuple.PileupDensity.pileupDensityCalo = cms.PSet(src=cms.InputTag("fixedGridRhoFastjetAllCalo"))
+
+		process.kappaTuple.MET.pfChMet = cms.PSet(src=cms.InputTag("pfChMet"))
+		process.kappaTuple.MET.metCHS = cms.PSet(src=cms.InputTag("pfMETCHS"))
+		process.kappaTuple.MET.metCHSNoHF = cms.PSet(src=cms.InputTag("pfMETCHSNoHF"))
+		process.kappaTuple.MET.met = cms.PSet(src=cms.InputTag("pfMet"))
+		process.kappaTuple.MET.metEI = cms.PSet(src=cms.InputTag("pfMetEI"))
+		if channel == 'mm':
+			process.kappaTuple.MET.metPuppi = cms.PSet(src=cms.InputTag("pfMetPuppi"))
+			process.kappaTuple.MET.metPuppiNoHF = cms.PSet(src=cms.InputTag("pfMetPuppiNoHF"))
+
 	# final information:
 	print "------- CONFIGURATION 2 ---------"
 	print "CMSSW producers:"
