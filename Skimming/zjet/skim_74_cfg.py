@@ -18,6 +18,7 @@ def baseconfig(
 		outputfilename,
 		channel='mm',
 		is_data=None,
+		kappa_verbosity=0,
 	):
 	"""
 	Create the CMSSW/cmsRun config for the z+jet skim
@@ -63,6 +64,7 @@ def baseconfig(
 	print "cmssw version:  ", '.'.join([str(i) for i in cmssw_version])
 	print "channel:        ", channel
 	print "add_puppi:      ", add_puppi
+	print "kappa verbosity:", kappa_verbosity
 	print "---------------------------------"
 	print
 
@@ -103,7 +105,7 @@ def baseconfig(
 		process.kappaTupleDefaultsBlock,
 		outputFile = cms.string(outputfilename),
 	)
-	process.kappaTuple.verbose = 0
+	process.kappaTuple.verbose = kappa_verbosity
 	process.kappaOut = cms.Sequence(process.kappaTuple)
 	process.kappaTuple.active = cms.vstring('VertexSummary', 'BeamSpot')
 	if data:
@@ -480,8 +482,9 @@ def main():
 			nickname=KappaParser.nickName,
 			outputfilename="skim74.root",
 			channel=KappaParser.channel,
+			kappa_verbosity=KappaParser.kappaVerbosity,
 		)
-	## for grid-control:
+	# grid-control:
 	else:
 		process = baseconfig(
 			globaltag='@GLOBALTAG@',
@@ -491,6 +494,7 @@ def main():
 			outputfilename='kappatuple.root',
 			channel=gc_var_or_callable_parameter(gc_var_name='@CHANNEL@', callable=baseconfig),
 			is_data=gc_var_or_callable_parameter(gc_var_name='@IS_DATA@', callable=baseconfig),
+			kappa_verbosity=gc_var_or_callable_parameter(gc_var_name='@KAPPA_VERBOSITY@', callable=baseconfig),
 		)
 	return process
 
