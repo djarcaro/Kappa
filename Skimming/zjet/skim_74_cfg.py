@@ -401,7 +401,7 @@ def baseconfig(
 	return process
 
 
-if __name__ == '__main__':
+def main():
 	# run local skim by hand without replacements by grid-control
 	if '@' in '@NICK@':
 		KappaParser = kappaparser.KappaParserZJet()
@@ -489,6 +489,10 @@ if __name__ == '__main__':
 			maxevents=-1,
 			nickname='@NICK@',
 			outputfilename='kappatuple.root',
-			channel = gc_var_or_callable_parameter(gc_var_name='@CHANNEL@', callable=baseconfig),
-			is_data = gc_var_or_callable_parameter(gc_var_name='@IS_DATA@', callable=baseconfig),
+			channel=gc_var_or_callable_parameter(gc_var_name='@CHANNEL@', callable=baseconfig),
+			is_data=gc_var_or_callable_parameter(gc_var_name='@IS_DATA@', callable=baseconfig),
 		)
+	return process
+
+if __name__ == '__main__':
+	process = main()
