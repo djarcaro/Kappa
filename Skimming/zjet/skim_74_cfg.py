@@ -456,6 +456,20 @@ if __name__ == '__main__':
 				'nickName': 'DYJetsToLL_M_50_madgraph_13TeV',
 				'channel': 'ee',
 			},
+			'763data15mm': {
+				'files': '/store/data/Run2015D/DoubleMuon/AOD/16Dec2015-v1/10000/14C7A2A3-5EA7-E511-B807-7845C4FC3A0D.root',
+				'globalTag' : '76X_dataRun2_v15',
+				'nickName': 'Zmm_Run2015D-16Dec2015-v1',
+				'channel': 'mm',
+				'is_data': True,
+			},
+			'763mc15mm': {
+				'files': '/store/mc/RunIIFall15DR76/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/70000/B87B479E-43A7-E511-909A-02163E016749.root',
+				'globalTag' : '76X_dataRun2_v15',
+				'nickName': 'Zmm_DYJetsToLL_M-50_madgraphMLM-pythia8_25ns',
+				'channel': 'mm',
+				'is_data': False,
+			}
 		}
 		KappaParser.parseArgumentsWithTestDict(testdict)
 
