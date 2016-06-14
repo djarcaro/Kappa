@@ -107,6 +107,10 @@ struct KMET : public KLV
 	float hfHadronFraction, hfEMFraction;
 	unsigned int leptonSelectionHash;
 	ROOT::Math::SMatrix<double, 2, 2, ROOT::Math::MatRepSym<double, 2> > significance;
+	RMFLV metJesShiftUp;
+	RMFLV metJesShiftDown;
+	float sumEtJesShiftUp;
+	float sumEtJesShiftDown;
 
 };
 typedef std::vector<KMET> KMETs;

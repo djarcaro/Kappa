@@ -41,6 +41,12 @@ public:
 			out.muonFraction = in.MuonEtFraction();
 			out.hfHadronFraction = in.Type6EtFraction();
 			out.hfEMFraction = in.Type7EtFraction();
+
+			// MET shifts due to JEC
+			out.metJesShiftUp     = in.shiftedP4(   pat::MET::JetEnUp);
+			out.sumEtJesShiftUp   = in.shiftedSumEt(pat::MET::JetEnUp);
+			out.metJesShiftDown   = in.shiftedP4(   pat::MET::JetEnDown);
+			out.sumEtJesShiftDown = in.shiftedSumEt(pat::MET::JetEnDown);
 		}
 	}
 
