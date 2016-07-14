@@ -3,12 +3,15 @@ language: cpp
 services:
   - docker
 env:
-  - TEST_CMSSW_VERSION: CMSSW_5_3_29
-  - TEST_CMSSW_VERSION: CMSSW_7_4_2
-  - TEST_CMSSW_VERSION: CMSSW_7_6_3
+  - TEST_CMSSW_VERSION=CMSSW_5_3_29 SCRAM_ARCH=slc6_amd64_gcc472
+  - TEST_CMSSW_VERSION=CMSSW_7_6_3 SCRAM_ARCH=slc6_amd64_gcc493
+  - TEST_CMSSW_VERSION=CMSSW_8_0_14 SCRAM_ARCH=slc6_amd64_gcc530
 compiler:
   - gcc
 before_install:
   - docker pull claria/cvmfs-cms
 script:
-  - docker run --privileged -e TEST_CMSSW_VERSION=${TEST_CMSSW_VERSION} -v ${TRAVIS_BUILD_DIR}:/home/travis claria/cvmfs-cms /bin/bash -c "cd /home/; /home/travis/test_build.sh"
+  - docker run --privileged -e TEST_CMSSW_VERSION=${TEST_CMSSW_VERSION}
+                            -e SCRAM_ARCH=${SCRAM_ARCH}
+                            -v ${TRAVIS_BUILD_DIR}:/home/travis claria/cvmfs-cms /bin/bash 
+                            -c "cd /home/; /home/travis/test_build.sh"
