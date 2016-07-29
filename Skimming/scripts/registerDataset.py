@@ -12,14 +12,12 @@ import json
 from Kappa.Skimming.registerDatasetHelper import *
 
 cmssw_base = os.environ.get("CMSSW_BASE")
-dataset = os.path.join(cmssw_base, "src/Kappa/Skimming/data/datasets.json")
 
 def check_nickname_unique(nickname):
-	if( len(get_sample_by_nick(nickname, expect_n_results = -1)) == 1):
-		print "The nickname is a unique identifier for the Sample"
-		print get_sample_by_nick(nickname, expect_n_results = -1)[0]
+	if( len(get_sample_by_nick(nickname, expect_n_results = -1)) == 0):
+		print "The nickname is a unique identifier."
 	else:
-		print "The new nickname would not be unique. Please adjust your settings"
+		print "The new nickname would not be unique. Please adjust your settings. Was it mayby already in datasets.json?"
 
 def register_new_sample(dict, options):
 	# split sample name
@@ -40,6 +38,8 @@ def register_new_sample(dict, options):
 	new_entry["format"]    = get_format(filetype, default=None)
 	new_entry["n_events_generated"]    = get_n_generated_events(sample)
 	new_entry["extension"] = get_extension(details)
+	if options.xsec:
+		new_entry["xsec"] = options.xsec
 	pprint.pprint(new_entry)
 	print "The nickname will be: "
 	print make_nickname(new_entry)
@@ -92,13 +92,14 @@ def main():
 
 	# sample
 	parser.add_option("-s", "--sample", help="official Sample Sting")
+	parser.add_option("-x", "--xsec", default="", help="crossection for this Sample")
 
 	parser.add_option("-i", "--interactive", help="run in interactive mode", action="store_true")
 	parser.add_option("-v", "--verbose", help="verbose output", action="store_true", default=False)
 
 	(options, args) = parser.parse_args()
 
-	dict = load_database(dataset)
+	dict = database
 	if options.verbose:
 		pprint(dict)
 	newdict = register_new_sample(dict, options)
