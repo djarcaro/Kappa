@@ -9932,5 +9932,19 @@
         "process": "ttHJetToTT_M130", 
         "scenario": "PUSpring16RAWAODSIM", 
         "xsec": 0.024743
+    },
+    "/EmbeddingRun2016B/MuTauFinalState-imputDoubleMu_nomirror_miniAOD-v4/USER": {
+        "campaign": "Embedding2016B", 
+        "data": true, 
+        "embedded": true, 
+        "energy": "13", 
+        "extension": "", 
+        "format": "MINIAOD", 
+        "generator": "", 
+        "generatorWeight": -1.0, 
+        "n_events_generated": "1", 
+        "n_files": "1", 
+        "process": "TauEmbedding", 
+        "scenario": "PromptRecov2"
     }
 }

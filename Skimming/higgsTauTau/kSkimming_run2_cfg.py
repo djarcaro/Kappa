@@ -45,7 +45,7 @@ options.parseArguments()
 # check if current release is abov a certain number
 def is_above_cmssw_version(version_to_test):
 	cmssw_version_number = tools.get_cmssw_version_number()
-	split_cmssw_version = [int(i) for i in cmssw_version_number.split("_")[0:2]]
+	split_cmssw_version = [int(i) for i in cmssw_version_number.split("_")[0:3]]
 	for index in range(len(version_to_test)):
 		if(version_to_test[index] > split_cmssw_version[index]):
 			return False
@@ -139,15 +139,20 @@ def getBaseConfig( globaltag= 'START70_V7::All',
 		process.kappaTuple.VertexSummary.refittedVerticesNoBSSummary = cms.PSet(src=cms.InputTag("RefitVertexNoBSProducer"))
 
 	process.kappaTuple.active += cms.vstring('TriggerObjectStandalone')
-	if(data and ("Run2015" in nickname or "Run2016" in nickname)):
+	
+	if isEmbedded:
+		process.kappaTuple.TriggerObjectStandalone.metfilterbits = cms.InputTag("TriggerResults", "", "SIMembedding")
+		process.kappaTuple.Info.hltSource = cms.InputTag("TriggerResults", "", "SIMembedding")
+	elif(data):
 		process.kappaTuple.TriggerObjectStandalone.metfilterbits = cms.InputTag("TriggerResults", "", "RECO")
+
 	if "reHLT" in datasetsHelper.get_campaign(nickname):
 		process.kappaTuple.TriggerObjectStandalone.bits = cms.InputTag("TriggerResults", "", "HLT2")
-	if not "reHLT" in datasetsHelper.get_campaign(nickname):
+	if not "reHLT" in datasetsHelper.get_campaign(nickname) and not isEmbedded:
 		# Adds for each HLT Trigger wich contains "Tau" or "tau" in the name a Filter object named "l1extratauccolltection" 
 		process.kappaTuple.TriggerObjectStandalone.l1extratauJetSource = cms.untracked.InputTag("l1extraParticles","IsoTau","RECO")
 	
-	process.kappaTuple.active += cms.vstring('BeamSpot')                 # save Beamspot,
+	process.kappaTuple.active += cms.vstring('BeamSpot')
 	if is_above_cmssw_version([7,6]):
 		process.kappaTuple.BeamSpot.offlineBeamSpot = cms.PSet(src = cms.InputTag("offlineBeamSpot"))
 
@@ -161,8 +166,12 @@ def getBaseConfig( globaltag= 'START70_V7::All',
 
 			process.kappaTuple.GenParticles.genParticles.src = cms.InputTag("prunedGenParticles")
 			process.kappaTuple.GenTaus.genTaus.src = cms.InputTag("prunedGenParticles")
+
 	# write out for all processes where available
 	process.kappaTuple.Info.lheWeightNames = cms.vstring(".*")
+
+	# save Flag
+	process.kappaTuple.Info.isEmbedded = cms.bool(isEmbedded)
 
 	if isEmbedded:
 		#process.load('RecoBTag/Configuration/RecoBTag_cff')
@@ -172,10 +181,15 @@ def getBaseConfig( globaltag= 'START70_V7::All',
 		#process.p *= process.btagging
 		# disable overrideHLTCheck for embedded samples, since it triggers an Kappa error
 		process.kappaTuple.Info.overrideHLTCheck = cms.untracked.bool(True)
-		process.kappaTuple.active += cms.vstring('DataInfo')
+		process.kappaTuple.active += cms.vstring('GenInfo')
 		process.kappaTuple.active += cms.vstring('GenParticles') # save GenParticles,
-		process.kappaTuple.active += cms.vstring('GenTaus') # save GenParticles,
-		process.kappaTuple.GenParticles.genParticles.src = cms.InputTag("genParticles","","EmbeddedRECO")
+		process.kappaTuple.GenParticles.genParticles.src = cms.InputTag("prunedGenParticles")
+		process.kappaTuple.active += cms.vstring('GenTaus')
+		process.kappaTuple.GenTaus.genTaus.src = cms.InputTag("prunedGenParticles")
+		
+		
+		#process.kappaTuple.active += cms.vstring('GenTaus') # save GenParticles,
+		#process.kappaTuple.GenParticles.genParticles.src = cms.InputTag("genParticles","","EmbeddedRECO")
 
 	## ------------------------------------------------------------------------
 	# Trigger
@@ -184,8 +198,8 @@ def getBaseConfig( globaltag= 'START70_V7::All',
 	process.kappaTuple.Info.hltBlacklist = hltBlacklist
 
 	## ------------------------------------------------------------------------
-
-	#process.kappaTuple.active += cms.vstring('packedPFCandidates') # save PFCandidates. Not sure for what, because might not be usefull for isolation
+	# should not be the default, it blows up the skim a lot
+	#process.kappaTuple.active += cms.vstring('packedPFCandidates')
 	#process.kappaTuple.packedPFCandidates.packedPFCandidates = cms.PSet(src = cms.InputTag("packedPFCandidates"))
 
 
@@ -297,8 +311,13 @@ def getBaseConfig( globaltag= 'START70_V7::All',
 
 	## Standard MET and GenMet from pat::MET
 	process.kappaTuple.active += cms.vstring('PatMET')
-	process.kappaTuple.PatMET.met = cms.PSet(src=cms.InputTag("slimmedMETs"))
-	process.kappaTuple.PatMET.pfmetT1 = cms.PSet(src=cms.InputTag("patpfMETT1"))
+	if is_above_cmssw_version([8,0,14]):
+		from PhysicsTools.PatUtils.tools.runMETCorrectionsAndUncertainties import runMetCorAndUncFromMiniAOD
+		runMetCorAndUncFromMiniAOD(process, isData=data  )
+		process.kappaTuple.PatMET.met = cms.PSet(src=cms.InputTag("slimmedMETs", "", "KAPPA"))
+	else:
+		process.kappaTuple.PatMET.met = cms.PSet(src=cms.InputTag("slimmedMETs"))
+	#process.kappaTuple.PatMET.pfmetT1 = cms.PSet(src=cms.InputTag("patpfMETT1"))
 	process.kappaTuple.PatMET.metPuppi = cms.PSet(src=cms.InputTag("slimmedMETsPuppi"))
 
 	## Write MVA MET to KMETs
